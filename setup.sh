@@ -34,6 +34,63 @@ else
 fi
 
 SETTINGS_FILE="$SETTINGS_DIR/settings.json"
+CLI_CONFIG_FILE="$HOME/.cursor/cli-config.json"
+
+# ── Détection Cursor Desktop vs CLI ───────────
+IS_DESKTOP=false
+IS_CLI=false
+
+if [[ -f "$SETTINGS_FILE" ]]; then
+  IS_DESKTOP=true
+fi
+
+if [[ -f "$CLI_CONFIG_FILE" ]]; then
+  IS_CLI=true
+fi
+
+# Détection heuristique : pas de DISPLAY + pas de settings desktop = probablement CLI
+if [[ -z "${DISPLAY:-}" ]] && [[ "$IS_DESKTOP" == false ]]; then
+  IS_CLI=true
+fi
+
+# ── Branche CLI (non supporté) ────────────────
+if [[ "$IS_CLI" == true ]] && [[ "$IS_DESKTOP" == false ]]; then
+  echo -e "${YELLOW}⚠ Cursor Agent CLI détecté (pas d'interface graphique).${NC}"
+  echo ""
+  echo -e "${RED}Le Cursor Agent CLI NE supporte PAS les endpoints OpenAI custom.${NC}"
+  echo -e "${RED}Les modèles custom + override base URL sont une fonctionnalité${NC}"
+  echo -e "${RED}du Cursor Desktop uniquement, pas du CLI.${NC}"
+  echo ""
+  echo -e "${BOLD}════════════════════════════════════════${NC}"
+  echo -e "${BOLD}  Alternative : Aider × DeepSeek${NC}"
+  echo -e "${BOLD}════════════════════════════════════════${NC}"
+  echo ""
+  echo -e "${GREEN}Aider${NC} est un outil de coding en terminal qui supporte"
+  echo -e "DeepSeek nativement, sans proxy ni hack."
+  echo ""
+  echo -e "${CYAN}Installation rapide :${NC}"
+  echo ""
+  echo -e "  ${BOLD}# 1. Installer Aider${NC}"
+  echo -e "  sudo apt update && sudo apt install -y pipx"
+  echo -e "  pipx ensurepath && source ~/.bashrc"
+  echo -e "  pipx install aider-chat"
+  echo ""
+  echo -e "  ${BOLD}# 2. Lancer avec DeepSeek${NC}"
+  echo -e "  export DEEPSEEK_API_KEY=\"sk-ta-clé\""
+  echo -e "  aider --model deepseek/deepseek-chat"
+  echo ""
+  echo -e "  ${BOLD}# 3. Mode architecte (optionnel)${NC}"
+  echo -e "  aider --model deepseek/deepseek-chat \\"
+  echo -e "        --architect-model deepseek/deepseek-reasoner"
+  echo ""
+  echo -e "${YELLOW}Plus d'infos : https://aider.chat${NC}"
+  echo ""
+  exit 0
+fi
+
+# ── Branche Desktop ────────────────────────────
+echo -e "${GREEN}✓ Cursor Desktop détecté${NC}"
+echo ""
 
 # ── Saisie clé API ────────────────────────────
 echo -e "${CYAN}Colle ta clé API DeepSeek (sk-...) :${NC}"

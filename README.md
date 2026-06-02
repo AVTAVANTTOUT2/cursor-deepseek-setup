@@ -2,6 +2,8 @@
 
 Configure Cursor IDE pour utiliser les modèles DeepSeek V4 (`deepseek-v4-pro` et `deepseek-v4-flash`) via l'API compatible OpenAI.
 
+> **Important :** ce script fonctionne uniquement avec **Cursor Desktop** (l'application avec interface graphique). Le **Cursor Agent CLI** (terminal/headless) ne supporte pas les endpoints OpenAI custom. Si tu es sur un serveur sans interface graphique, vois la section [Alternative pour serveur headless](#alternative-pour-serveur-headless).
+
 ## Utilisation rapide
 
 ```bash
@@ -15,19 +17,20 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-Le script te demandera ta clé API DeepSeek (`sk-...`) et configurera automatiquement Cursor.
+Le script détecte automatiquement si tu es sur Desktop ou CLI, et te guide en conséquence.
 
 ## Ce que fait le script
 
 1. **Détecte ton OS** (macOS, Linux, Windows)
-2. **Sauvegarde** ton `settings.json` existant
-3. **Configure** l'URL de base DeepSeek (`https://api.deepseek.com`)
-4. **Ajoute** les modèles `deepseek-v4-flash` et `deepseek-v4-pro`
-5. **Enregistre** ta clé API dans le champ compatible OpenAI
+2. **Détecte Cursor Desktop vs CLI** (ne tente pas de configurer un CLI non supporté)
+3. **Sauvegarde** ton `settings.json` existant
+4. **Configure** l'URL de base DeepSeek (`https://api.deepseek.com`)
+5. **Ajoute** les modèles `deepseek-v4-flash` et `deepseek-v4-pro`
+6. **Enregistre** ta clé API dans le champ compatible OpenAI
 
 ## Étape manuelle après le script
 
-Dans Cursor : **Settings → Models →** activer **Override OpenAI Base URL**
+Dans Cursor Desktop : **Settings → Models →** activer **Override OpenAI Base URL**
 
 ## Modèles disponibles
 
@@ -43,11 +46,33 @@ Dans Cursor : **Settings → Models →** activer **Override OpenAI Base URL**
 3. Va dans **API Keys** → **Create new key**
 4. Copie la clé (format `sk-...`)
 
+## Alternative pour serveur headless
+
+Si tu utilises Cursor Agent CLI sur un serveur sans interface graphique (Debian, Ubuntu Server, etc.), le Cursor CLI ne supporte **pas** les endpoints OpenAI custom. Utilise plutôt **[Aider](https://aider.chat)** :
+
+```bash
+# Installation
+sudo apt update && sudo apt install -y pipx
+pipx ensurepath && source ~/.bashrc
+pipx install aider-chat
+
+# Utilisation avec DeepSeek
+export DEEPSEEK_API_KEY="sk-ta-clé"
+aider --model deepseek/deepseek-chat
+
+# Mode architecte (deepseek-reasoner pour le design, deepseek-chat pour le code)
+aider --model deepseek/deepseek-chat \
+      --architect-model deepseek/deepseek-reasoner
+```
+
+Aider fonctionne 100% en terminal, supporte DeepSeek nativement, et intègre git automatiquement.
+
 ## Compatibilité
 
-- macOS (Apple Silicon / Intel)
-- Linux (x86_64, ARM64)
-- Windows (Git Bash, WSL)
+| Version Cursor | Supporté |
+|---------------|---------|
+| Cursor Desktop (macOS, Linux, Windows) | Oui |
+| Cursor Agent CLI (terminal/headless) | Non — utiliser Aider |
 
 ## Sécurité
 
